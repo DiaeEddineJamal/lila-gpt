@@ -40,7 +40,7 @@ export default function Home() {
   return (
     <main className="flex min-h-screen flex-col items-center p-12 text-lg">
       <LogoTitle
-        logoSrc={logo2}  // Pass the imported logo directly
+        logoSrc={logo}  // Pass the imported logo directly
         logoAlt="Your Company Logo"
         title=""
         className="mb-4"  // Add some margin bottom for spacing
