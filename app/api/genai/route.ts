@@ -14,7 +14,7 @@ export async function POST(req: Request) {
     console.log("Prompt:", prompt);
 
     const ollama = new Ollama({
-      baseUrl: 'http://localhost:11434',
+      baseUrl: 'https://immune-humpback-heartily.ngrok-free.app',
       model: 'Luzivx/luzivila-model',
     });
 
