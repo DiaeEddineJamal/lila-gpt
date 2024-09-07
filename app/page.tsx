@@ -1,6 +1,7 @@
 "use client";
 
 import { useChat } from "ai/react";
+import { SpeedInsights } from "@vercel/speed-insights/next"
 import { useEffect, useRef } from "react";
 import {
   Bot,
@@ -57,6 +58,7 @@ export default function Home() {
 
       {/* Dummy div to scroll to */}
       <div ref={messagesEndRef} />
+      <SpeedInsights />
     </main>
   );
 }
