@@ -20,7 +20,8 @@ body {
   font-size: 16px;
   line-height: 1.5;
   transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
-  overflow-y: scroll; /* Always show scrollbar to prevent layout shifts */
+  margin: 0;
+  padding: 0;
 }
 
 /* Hide scrollbar for Chrome, Safari and Opera */
@@ -38,65 +39,118 @@ body.submitting {
   overflow-y: hidden;
 }
 
+main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 100vh;
+  padding: 1rem;
+}
+
+/* Scrollable Messages Container */
+.messages-container {
+  flex: 1;
+  width: 100%;
+  overflow-y: auto; /* Allow scrolling when content overflows */
+  padding-bottom: 120px; /* Space for the fixed input form */
+}
+
+/* Show scrollbar only when content overflows */
+.messages-container::-webkit-scrollbar {
+  width: 8px; /* Width of the scrollbar */
+}
+
+.messages-container::-webkit-scrollbar-track {
+  background: transparent; /* Transparent track */
+}
+
+.messages-container::-webkit-scrollbar-thumb {
+  background: #7B61FF; /* Accent color for the scrollbar thumb */
+  border-radius: 4px; /* Rounded corners */
+}
+
+.messages-container::-webkit-scrollbar-thumb:hover {
+  background: #6A4EFF; /* Darker accent color on hover */
+}
+
 .text-balance {
   text-wrap: balance;
 }
 
-#chatbox {
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
-  padding: 2rem;
-  animation: fade-in 0.5s ease-in-out;
-}
-
+/* Message Bubble Styles */
 .chat-bubble {
   display: inline-block;
-  padding: 1.25rem 2rem;
+  padding: 1.5rem 2rem;
   border-radius: var(--message-border-radius);
   max-width: 75%;
-  background-color: var(--assistant-message-color);
-  color: var(--assistant-text-color);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
   position: relative;
 }
 
-.chat-bubble:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
-}
-
 .chat-bubble.user {
+  background: linear-gradient(135deg, #7B61FF, #6A4EFF);
+  color: white;
   align-self: flex-end;
-  background-color: var(--user-message-color);
-  color: var(--user-text-color);
   animation: slide-in-right 0.5s ease-in-out;
-  padding-left: calc(var(--icon-size) + 1rem);
 }
 
-.chat-bubble.user:before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  right: -10px;
-  transform: translateY(-50%);
-  border-top: 10px solid transparent;
-  border-bottom: 10px solid transparent;
-  border-left: 10px solid var(--user-message-color);
+.chat-bubble.assistant {
+  background: linear-gradient(135deg, #3C3C3C, #2F2F2F);
+  color: white;
+  align-self: flex-start;
+  animation: slide-in-left 0.5s ease-in-out;
 }
 
-.chat-bubble.assistant:before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: -10px;
-  transform: translateY(-50%);
-  border-top: 10px solid transparent;
-  border-bottom: 10px solid transparent;
-  border-right: 10px solid var(--assistant-message-color);
+.chat-bubble:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
 
+/* Typography and Spacing */
+#chatbox {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 2rem;
+}
+
+/* Animations */
+@keyframes fade-in {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-in-right {
+  0% {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-in-left {
+  0% {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Chat Bubble Icons */
 .chat-bubble .icon {
   position: absolute;
   top: 50%;
@@ -115,39 +169,22 @@ body.submitting {
   transform: translateY(-50%) scale(1.1);
 }
 
-@keyframes fade-in {
-  0% {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
+/* Copy Button */
+.copy-button {
+  position: absolute;
+  top: 50%;
+  right: -2rem;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #7B61FF;
+  transition: color 0.2s ease-in-out;
 }
 
-@keyframes slide-in-right {
-  0% {
-    opacity: 0;
-    transform: translateX(50px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateX(0);
-  }
+.copy-button:hover {
+  color: #6A4EFF;
 }
 
-@keyframes slide-in-left {
-  0% {
-    opacity: 0;
-    transform: translateX(-50px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
+/* Links in Messages */
 #chatbox a {
   color: var(--accent-color);
   font-weight: bold;
@@ -156,4 +193,101 @@ body.submitting {
 
 #chatbox a:hover {
   color: lighten(var(--accent-color), 10%);
+}
+
+/* Input Form Styling */
+.input-form {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 1rem;
+  background-color: var(--background-color);
+  backdrop-filter: blur(10px);
+}
+
+.input-form input {
+  width: 100%;
+  padding: 1rem;
+  border-radius: var(--message-border-radius);
+  background-color: var(--user-message-color);
+  color: var(--user-text-color);
+  border: none;
+  outline: none;
+  transition: background-color 0.3s ease-in-out;
+}
+
+.input-form input:focus {
+  background-color: var(--assistant-message-color);
+}
+
+.input-form button {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: var(--accent-color);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 0.75rem;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease-in-out;
+}
+
+.input-form button:hover {
+  background-color: #6A4EFF;
+}
+/* Add these styles to your existing globals.css */
+
+/* Code Block Wrapper */
+.code-block-wrapper {
+  position: relative;
+  background-color: #2d2d2d; /* Dark background for code */
+  border-radius: 0.5rem;
+  margin: 1rem 0;
+  overflow: hidden;
+}
+
+/* Code Block Styles */
+.code-block {
+  padding: 1rem;
+  overflow-x: auto;
+}
+
+.code-block code {
+  font-family: "Source Code Pro", monospace;
+  font-size: 0.9rem;
+  color: #f8f8f2; /* Default text color for code */
+}
+
+/* Copy Button for Code Blocks */
+.copy-code-button {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background-color: #7B61FF;
+  border: none;
+  border-radius: 0.25rem;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.copy-code-button:hover {
+  background-color: #6A4EFF;
+}
+
+.copy-icon {
+  width: 1rem;
+  height: 1rem;
+  color: white;
+}
+
+.copy-code-button span {
+  color: white;
+  font-size: 0.875rem;
 }

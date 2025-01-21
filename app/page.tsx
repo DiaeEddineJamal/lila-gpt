@@ -1,64 +1,78 @@
 "use client";
 
 import { useChat } from "ai/react";
-import { SpeedInsights } from "@vercel/speed-insights/next"
-import { useEffect, useRef } from "react";
-import {
-  Bot,
-  Loader,
-  Loader2,
-  MoreHorizontal,
-  Plus,
-  Send,
-  User2,
-  X,
-} from "lucide-react";
+import { SpeedInsights } from "@vercel/speed-insights/next";
+import { useEffect, useRef, useState } from "react";
+import { Bot, Loader2, Send, Image as ImageIcon } from "lucide-react";
 import Image from "next/image";
-import Markdown from "./component/markdown";
-import { ChangeEvent, useState } from "react";
-import SelectedImages from "./component/selectedImages";
 import Messages from "./component/messages";
 import InputForm from "./component/inputForm";
 import LogoTitle from "./component/headx";
 import logo from "./component/images/logo.png";
-import logo2 from "./component/images/logo2.png"; // Import logo image
 
 export default function Home() {
-  const { messages, input, handleInputChange, handleSubmit, isLoading, stop } =
-    useChat({
-      api: "api/genai",
-    });
+    const { messages, input, handleInputChange, handleSubmit, isLoading, stop, append } =
+        useChat({
+            api: "api/genai",
+        });
 
-  // Reference to the bottom of the messages list
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+    const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Scroll to the bottom whenever messages change
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+    useEffect(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, [messages]);
 
-  return (
-    <main className="flex min-h-screen flex-col items-center p-12 text-lg">
-      <LogoTitle
-        logoSrc={logo}  // Pass the imported logo directly
-        logoAlt="Your Company Logo"
-        title=""
-        className="mb-4"  // Add some margin bottom for spacing
-      />
-      
-      <InputForm
-        input={input}
-        handleInputChange={handleInputChange}
-        handleSubmit={handleSubmit}
-        isLoading={isLoading}
-        stop={stop}
-      />
-      
-      <Messages messages={messages} isLoading={isLoading} />
+    const generateImage = async (prompt: string) => {
+        try {
+            const response = await fetch("/api/genai", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    messages: [{ role: "user", content: prompt }],
+                    isImageGeneration: true, // Add this flag for image generation
+                }),
+            });
 
-      {/* Dummy div to scroll to */}
-      <div ref={messagesEndRef} />
-      <SpeedInsights />
-    </main>
-  );
+            if (!response.ok) {
+                const errorResponse = await response.text(); // Log the error response
+                console.error("API Error Response:", errorResponse);
+                throw new Error("Failed to generate image");
+            }
+
+            const { imageUrl } = await response.json();
+            append({ role: "assistant", content: imageUrl });
+        } catch (error) {
+            console.error("Error generating image:", error);
+            append({ role: "assistant", content: "Failed to generate image. Please try again." });
+        }
+    };
+
+    return (
+        <main className="flex flex-col items-center min-h-screen p-4 text-lg">
+            <LogoTitle
+                logoSrc={logo}
+                logoAlt="Your Company Logo"
+                title=""
+                className="mb-4"
+            />
+
+            <div className="flex-1 w-full overflow-y-auto pb-24 messages-container">
+                <Messages messages={messages} isLoading={isLoading} />
+                <div ref={messagesEndRef} />
+            </div>
+
+            <InputForm
+                input={input}
+                handleInputChange={handleInputChange}
+                handleSubmit={handleSubmit}
+                isLoading={isLoading}
+                stop={stop}
+                generateImage={generateImage}
+            />
+
+            <SpeedInsights />
+        </main>
+    );
 }
